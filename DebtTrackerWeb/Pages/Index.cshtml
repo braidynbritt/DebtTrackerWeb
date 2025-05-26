@@ -1,0 +1,93 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>@ViewData["Title"]</title>
+        <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
+    </head>
+    <body>
+        <h1>Debt Tracker</h1>
+
+        <div>
+            <label for="total-goal">Enter Total Debt Goal:</label>
+            <input type="number" id="total-goal" placeholder="e.g. 5471.81"/>
+            <label for="start-date"> Start Date:</label>
+            <input type="date" id="start-date"/>
+            <label for="end-date"> End Date:</label>
+            <input type="date" id="end-date" />
+            <button onclick=setTotalGoal()>Set Total Goal</button>
+        </div>
+
+        <p id="deadline-status"></p>
+
+        <div id="total-progress-container" style="position: relative; width: 100%; max-width: 600px; display: none">
+            <div class="progress-bar">
+                <div class="progress-fill" id="total-fill"></div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; font-size: 0.9em; margin-top: 4px;">
+                <span id="progress-amount-paid">$0.00 paid</span>
+                <span id="progress-amount-remaining">$0.00 left of $0.00</span>
+            </div>
+
+            <div class="legend">
+                <strong style="display: block;">Payment Bar</strong>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.9em;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <div style="width: 16px; height: 16px; background-color: #4caf50;"></div> Ahead
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <div style="width: 16px; height: 16px; background-color: #ffc107;"></div> On Track
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <div style="width: 16px; height: 16px; background-color: #f44336;"></div> Behind
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="time-progress-container" style="position: relative; width: 100%; max-width: 600px; display: none">
+            <label>Time Progress</label>
+            <div class="progress-bar">
+                <div class="progress-fill" id="time-fill"></div>
+            </div>
+
+            <p style="margin: 1px; font-size: 0.9em;" id="time-progress-text">0 days passed, 0 days remaining</p>
+
+            <div class="legend">
+                <strong style="display: block;">Time Bar</strong>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.9em;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <div style="width: 16px; height: 16px; background-color: #4caf50;"></div> Early
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <div style="width: 16px; height: 16px; background-color: #ffc107;"></div> Midway
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <div style="width: 16px; height: 16px; background-color: #f44336;"></div> Deadline Close
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="add-payment" style="display: none">
+            <label for="payment-amount">Add a Payment:</label>
+            <input type="number" id="payment-amount" placeholder="e.g. 250.00" />
+            <button onclick="submitPayment()"> Submit Payment</button>
+        </div>
+
+        @* <button id="add-mini-goal" style="display: none; margin-top: 6px" onclick="addGoal()">Add Mini Goal</button>
+
+        <div id="goal-list">
+
+        </div> *@
+
+        <script src="~/js/script.js" asp-append-version="true"></script>
+    </body>
+</html>

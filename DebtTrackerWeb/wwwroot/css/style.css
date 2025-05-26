@@ -1,0 +1,45 @@
+﻿.progress-bar {
+    width: 100%;
+    max-width: 600px;
+    background: #ddd;
+    height: 24px;
+    border-radius: 12px;
+    margin: 10px 0;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2)
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    transition: width 0.4s ease;
+    border-radius: 12px 0 0 12px;
+}
+
+.legend {
+    font-size: 0.9em;
+    margin-top: 4px;
+}
+
+.legend div {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+#total-progress-container span {
+    color: #333;
+}
+
+#deadline-status {
+    font-weight: bold;
+    margin-top: 10px;
+    color: #333;
+}
+
+#add-payment {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 8px;
+}
