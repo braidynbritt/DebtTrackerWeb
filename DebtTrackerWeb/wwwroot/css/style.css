@@ -1,4 +1,10 @@
-﻿.progress-bar {
+﻿html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.progress-bar {
     width: 100%;
     max-width: 600px;
     background: #ddd;
@@ -42,4 +48,35 @@
     flex-direction: column;
     gap: 10px;
     margin-top: 8px;
+}
+
+#add-mini-goal {
+    position: relative;
+    z-index: 9999;
+    pointer-events: auto;
+}
+
+details[open] summary + div {
+    animation: slideDown 0.3s ease forwards;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: scaleY(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scaleY(1);
+    }
+}
+
+details summary .toggle-arrow {
+    transition: transform 0.3s ease;
+    display: inline-block;
+}
+
+details[open] summary .toggle-arrow {
+    transform: rotate(90deg);
 }
