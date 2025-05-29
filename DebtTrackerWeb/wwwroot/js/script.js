@@ -14,6 +14,105 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("submit-mini-goal").addEventListener("click", confirmAddMiniGoal);
 
+    document.getElementById("exportBtn").addEventListener("click", () => {
+        const data = {
+            totalGoal,
+            totalPaid,
+            miniGoalIdCounter,
+            miniGoals
+        };
+
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const formattedDate = `${yyyy}-${mm}-${dd}`;
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `debt-tracker-${formattedDate}.json`;
+        a.click();
+
+        URL.revokeObjectURL(url);
+    });
+
+    document.getElementById("importBtn").addEventListener("click", () => {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".json";
+        input.style.display = "none";
+
+        input.addEventListener("change", (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (validateImportedData(importedData)) {
+                        applyImportedData(importedData);
+                        alert("Data imported successfully.");
+                    } else {
+                        alert("Invalid file format.");
+                    }
+                } catch (err) {
+                    console.error("Import error:", err);
+                    alert("Failed to read file.");
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        document.body.appendChild(input);
+        input.click();
+        document.body.removeChild(input);
+    });
+
+    function validateImportedData(data) {
+        return (
+            typeof data.totalGoal === "number" &&
+            typeof data.totalPaid === "number" &&
+            typeof data.miniGoalIdCounter === "number" &&
+            Array.isArray(data.miniGoals)
+        );
+    }
+
+    function applyImportedData(data) {
+        totalGoal = data.totalGoal;
+        totalPaid = data.totalPaid;
+        miniGoalIdCounter = data.miniGoalIdCounter;
+
+        miniGoals = [];
+        for (const goal of data.miniGoals) {
+            goal.start = new Date(goal.start);
+            goal.end = new Date(goal.end);
+            miniGoals.push(goal);
+        }
+
+        saveToLocalStorage();
+        render();
+    }
+
+
+    function render() {
+        const goalList = document.getElementById("goal-list");
+        while (goalList.firstChild) {
+            goalList.removeChild(goalList.firstChild);
+        }
+
+        for (const goal of miniGoals) {
+            renderMiniGoal(goal);
+            updateMiniGoalProgress(goal);
+        }
+
+        updateTotalFromMiniGoals();
+        showAllSections();
+    }
+
     function saveToLocalStorage() {
         const data = {
             miniGoals,
@@ -26,7 +125,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         localStorage.setItem("debtTrackerData", JSON.stringify(data));
     }
-
 
     function loadFromLocalStorage() {
         const saved = localStorage.getItem("debtTrackerData");
@@ -274,8 +372,8 @@ document.addEventListener("DOMContentLoaded", () => {
         totalGoal = miniGoals.reduce((sum, goal) => sum + goal.amount, 0);
         totalPaid = miniGoals.reduce((sum, goal) => sum + goal.paid, 0);
 
-        const allStarts = miniGoals.map(g => g.start);
-        const allEnds = miniGoals.map(g => g.end);
+        const allStarts = miniGoals.map(g => g.start).filter(d => d instanceof Date && !isNaN(d));
+        const allEnds = miniGoals.map(g => g.end).filter(d => d instanceof Date && !isNaN(d));
 
         startDate = new Date(Math.min(...allStarts.map(d => d.getTime())));
         endDate = new Date(Math.max(...allEnds.map(d => d.getTime())));
@@ -407,13 +505,14 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("total-progress-container").style.display = "block";
         document.getElementById("time-progress-container").style.display = "block";
         document.getElementById("reset-all").style.display = "block";
+
+        document.getElementById("mini-goal-section").style.display = miniGoals.length > 0 ? "block" : "none";
     }
 
     function resetAll() {
         const confirmReset = confirm("Are you sure you want to reset everything? This will delete all mini-goals and progress.");
         if (!confirmReset) return;
 
-        // Now do the full reset
         totalGoal = 0;
         totalPaid = 0;
         startDate = null;
@@ -423,19 +522,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
         localStorage.clear();
 
-        // Clear input fields
         document.getElementById("mini-goal-title").value = "";
         document.getElementById("mini-goal-amount").value = "";
         document.getElementById("mini-goal-start").value = "";
         document.getElementById("mini-goal-end").value = "";
 
-        // Hide sections
         document.getElementById("total-progress-container").style.display = "none";
         document.getElementById("time-progress-container").style.display = "none";
         document.getElementById("reset-all").style.display = "none";
         document.getElementById("mini-goal-section").style.display = "none";
 
-        // Reset visual text
         document.getElementById("total-fill").style.width = "0%";
         document.getElementById("time-fill").style.width = "0%";
         document.getElementById("progress-amount-paid").innerText = "$0.00 paid";
@@ -444,7 +540,6 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("time-progress-text").innerText = "";
         document.getElementById("total-date-range").innerText = "";
 
-        // Clear all mini-goal cards
         const goalList = document.getElementById("goal-list");
         while (goalList.firstChild) {
             goalList.removeChild(goalList.firstChild);
