@@ -72,6 +72,45 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.removeChild(input);
     });
 
+    document.getElementById("sort-options").addEventListener("change", () => {
+        const selected = document.getElementById("sort-options").value;
+        document.getElementById("sort-hint").style.display = "none";
+
+        miniGoals.sort((a, b) => {
+            switch (selected) {
+                case "amount-asc":
+                    return a.amount - b.amount;
+                case "amount-desc":
+                    return b.amount - a.amount;
+                case "date-asc":
+                    return new Date(a.end) - new Date(b.end);
+                case "date-desc":
+                    return new Date(b.end) - new Date(a.end);
+                case "time-asc": {
+                    const aProgress = (Date.now() - new Date(a.start)) / (new Date(a.end) - new Date(a.start));
+                    const bProgress = (Date.now() - new Date(b.start)) / (new Date(b.end) - new Date(b.start));
+                    return aProgress - bProgress;
+                }
+                case "time-desc": {
+                    const aProgress = (Date.now() - new Date(a.start)) / (new Date(a.end) - new Date(a.start));
+                    const bProgress = (Date.now() - new Date(b.start)) / (new Date(b.end) - new Date(b.start));
+                    return bProgress - aProgress;
+                }
+                case "status-asc": {
+                    const getStatusValue = g => g.paid >= g.amount ? 2 : (g.paid / g.amount >= 0.5 ? 1 : 0);
+                    return getStatusValue(a) - getStatusValue(b);
+                }
+                case "status-desc": {
+                    const getStatusValue = g => g.paid >= g.amount ? 2 : (g.paid / g.amount >= 0.5 ? 1 : 0);
+                    return getStatusValue(b) - getStatusValue(a);
+                }
+                default:
+                    return 0;
+            }
+        });
+        render();
+    });
+
     function validateImportedData(data) {
         return (
             typeof data.totalGoal === "number" &&
@@ -97,8 +136,46 @@ document.addEventListener("DOMContentLoaded", () => {
         render();
     }
 
+    function sortMiniGoalsBySelectedOption() {
+        const selected = document.getElementById("sort-options").value;
+
+        miniGoals.sort((a, b) => {
+            switch (selected) {
+                case "amount-asc":
+                    return a.amount - b.amount;
+                case "amount-desc":
+                    return b.amount - a.amount;
+                case "date-asc":
+                    return new Date(a.end) - new Date(b.end);
+                case "date-desc":
+                    return new Date(b.end) - new Date(a.end);
+                case "time-asc": {
+                    const aProgress = (Date.now() - new Date(a.start)) / (new Date(a.end) - new Date(a.start));
+                    const bProgress = (Date.now() - new Date(b.start)) / (new Date(b.end) - new Date(b.start));
+                    return aProgress - bProgress;
+                }
+                case "time-desc": {
+                    const aProgress = (Date.now() - new Date(a.start)) / (new Date(a.end) - new Date(a.start));
+                    const bProgress = (Date.now() - new Date(b.start)) / (new Date(b.end) - new Date(b.start));
+                    return bProgress - aProgress;
+                }
+                case "status-asc": {
+                    const getStatusValue = g => g.paid >= g.amount ? 2 : (g.paid / g.amount >= 0.5 ? 1 : 0);
+                    return getStatusValue(a) - getStatusValue(b);
+                }
+                case "status-desc": {
+                    const getStatusValue = g => g.paid >= g.amount ? 2 : (g.paid / g.amount >= 0.5 ? 1 : 0);
+                    return getStatusValue(b) - getStatusValue(a);
+                }
+                default:
+                    return 0;
+            }
+        });
+    }
 
     function render() {
+        sortMiniGoalsBySelectedOption();
+
         const goalList = document.getElementById("goal-list");
         while (goalList.firstChild) {
             goalList.removeChild(goalList.firstChild);
@@ -145,10 +222,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 goal.end = new Date(goal.end);
                 miniGoals.push(goal);
                 renderMiniGoal(goal);
+                updateMiniGoalProgress(goal);
                 updateMiniDeadlineProgress(goal);
             }
 
             updateTotalFromMiniGoals();
+            sortMiniGoalsBySelectedOption();
             showAllSections();
             if (miniGoals.length > 0) {
                 document.getElementById("mini-goal-section").style.display = "block";
@@ -175,8 +254,20 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        const startDateobj = new Date(start);
-        const endDateobj = new Date(end);
+        const [sYear, sMonth, sDay] = start.split("-").map(Number);
+        const startDateobj = new Date(sYear, sMonth - 1, sDay);
+
+        const [eYear, eMonth, eDay] = end.split("-").map(Number);
+        const endDateobj = new Date(eYear, eMonth - 1, eDay);
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (endDateobj < today) {
+            alert("End date cannot be in the past.");
+            return;
+        }
+
         if (startDateobj >= endDateobj) {
             alert("Start date must be before end date.");
             return;
@@ -214,18 +305,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const barId = `mini-bar-${goal.id}`;
         const fillId = `mini-fill-${goal.id}`;
-        const statusId = `mini-status-${goal.id}`;
 
-        const progressRatio = goal.paid / goal.amount;
-        let statusLabel = "⚠️ On Track";
-        let statusColor = "#ffc107";
+        let statusLabel;
+        let statusColor;
 
-        if (progressRatio >= 1) {
+        if (goal.paid >= goal.amount) {
             statusLabel = "✅ Goal Met";
-            statusColor = "#4caf50";
-        } else if (progressRatio < 0.5) {
+            statusColor = "green";
+        } else if (goal.paid / goal.amount < 0.5) {
             statusLabel = "❌ Behind";
-            statusColor = "#f44336";
+            statusColor = "red";
+        } else {
+            statusLabel = "⚠️ On Track";
+            statusColor = "yellow";
         }
 
         container.innerHTML = `
@@ -244,7 +336,9 @@ document.addEventListener("DOMContentLoaded", () => {
                         ${goal.title}
                     </span>
 
-                    <span style="color: ${statusColor}; font-size: 0.85em;">${statusLabel}</span>
+                    <span id="mini-status-${goal.id}" style="color: ${statusColor}; font-size: 0.85em;">
+                        ${statusLabel}
+                    </span>
                 </summary>
                 <div style="margin-left: 10px;">
                 <div class="progress-bar" id="${barId}">
@@ -278,7 +372,24 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("goal-list").appendChild(container);
     }
 
-    function updateMiniDeadlineProgress(goal){
+    function updateMiniDeadlineProgress(goal) {
+        if (goal.paid >= goal.amount) {
+
+            const timeFill = document.getElementById(`mini-time-fill-${goal.id}`);
+            const timeStatus = document.getElementById(`mini-time-status-${goal.id}`);
+
+            if (timeFill) {
+                timeFill.style.width = "100%";
+                timeFill.style.backgroundColor = "green";
+            }
+
+            if (timeStatus) {
+                timeStatus.innerText = "Goal fully paid";
+            }
+
+            return;
+        }
+
         const now = new Date();
         const msPerDay = 1000 * 60 * 60 * 24;
         const totalDuration = goal.end - goal.start;
@@ -297,18 +408,18 @@ document.addEventListener("DOMContentLoaded", () => {
         const timeFill = document.getElementById(`mini-time-fill-${goal.id}`);
         const timeStatus = document.getElementById(`mini-time-status-${goal.id}`);
 
-        let color = "Yellow";
-        if (diff > 0.05) color = "Green";
-        else if (diff < -0.05) color = "Red";
+        let color = "yellow";
+        if (diff > 0.05) color = "green";
+        else if (diff < -0.05) color = "red";
 
         if (fill) fill.style.backgroundColor = color;
 
         const timeFillAmount = Math.min((daysPassed / totalDays) * 100, 100);
         if (timeFill) {
             timeFill.style.width = `${timeFillAmount}%`;
-            if (timeFillAmount >= 80) timeFill.style.backgroundColor = "Red";
-            else if (timeFillAmount >= 40) timeFill.style.backgroundColor = "Yellow";
-            else timeFill.style.backgroundColor = "Green";
+            if (timeFillAmount >= 80) timeFill.style.backgroundColor = "red";
+            else if (timeFillAmount >= 40) timeFill.style.backgroundColor = "yellow";
+            else timeFill.style.backgroundColor = "green";
         }
 
         if (timeStatus) {
@@ -349,6 +460,25 @@ document.addEventListener("DOMContentLoaded", () => {
         const fill = document.getElementById(`mini-fill-${goal.id}`);
         const status = document.getElementById(`mini-status-${goal.id}`);
 
+        let statusLabel;
+        let statusColor;
+
+        if (goal.paid >= goal.amount) {
+            statusLabel = "✅ Goal Met";
+            statusColor = "green";
+        } else if (goal.paid / goal.amount < 0.5) {
+            statusLabel = "❌ Behind";
+            statusColor = "red";
+        } else {
+            statusLabel = "⚠️ On Track";
+            statusColor = "yellow";
+        }
+
+        if (status) {
+            status.innerText = statusLabel;
+            status.style.color = statusColor;
+        }
+
         if (fill) fill.style.width = `${Math.min(percent, 100)}%`;
         const paidSpan = document.getElementById(`mini-paid-${goal.id}`);
         const remainingSpan = document.getElementById(`mini-remaining-${goal.id}`);
@@ -357,6 +487,21 @@ document.addEventListener("DOMContentLoaded", () => {
             const remaining = goal.amount - goal.paid;
             remainingSpan.innerText = `$${remaining.toFixed(2)} left of $${goal.amount.toFixed(2)}`;
         }
+
+        const container = document.querySelector(`[data-goal-id="${goal.id}"]`);
+        if (container) {
+            const input = container.querySelector(".mini-payment");
+            const payButton = container.querySelector("button[onclick^='submitMiniPayment']");
+
+            if (input) {
+                input.disabled = goal.paid >= goal.amount;
+            }
+
+            if (payButton) {
+                payButton.disabled = goal.paid >= goal.amount;
+            }
+        }
+
         updateMiniDeadlineProgress(goal);
     }
 
@@ -469,14 +614,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const progressDifferenceDollars = percentageDifference * totalGoal;
         
         let statusText = "";
-        let barColor = "Yellow";
+        let barColor = "yellow";
 
         if (percentageDifference > 0.05) {
             statusText = `You're ahead by $${progressDifferenceDollars.toFixed(2)}`;
-            barColor = "Green";
+            barColor = "green";
         } else if (percentageDifference < -0.05) {
             statusText = `You're behind by $${Math.abs(progressDifferenceDollars).toFixed(2)}`;
-            barColor = "Red";
+            barColor = "red";
         } else {
             statusText = `You're on track`;
         }
@@ -488,11 +633,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const fillAmount = Math.min((daysPassed / totalDays) * 100, 100);
             timeFill.style.width = `${fillAmount}%`;
 
-            let timeColor = "Green";
+            let timeColor = "green";
             if (fillAmount >= 80) {
-                timeColor = "Red";
+                timeColor = "red";
             } else if (fillAmount >= 40) {
-                timeColor = "Yellow"
+                timeColor = "yellow"
             }
 
             timeFill.style.backgroundColor = timeColor;
@@ -502,11 +647,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function showAllSections() {
+        const miniGoalsToggle = document.querySelector('button[onclick="toggleMiniGoalList()"]');
+
         document.getElementById("total-progress-container").style.display = "block";
         document.getElementById("time-progress-container").style.display = "block";
         document.getElementById("reset-all").style.display = "block";
 
         document.getElementById("mini-goal-section").style.display = miniGoals.length > 0 ? "block" : "none";
+
+        if (miniGoalsToggle) {
+            miniGoalsToggle.style.display = miniGoals.length > 0 ? "inline-block" : "none";
+        }
     }
 
     function resetAll() {
