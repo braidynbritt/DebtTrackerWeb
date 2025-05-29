@@ -14,6 +14,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("submit-mini-goal").addEventListener("click", confirmAddMiniGoal);
 
+    document.getElementById("cancel-mini-goal").addEventListener("click", () => {
+        document.getElementById("mini-goal-title").value = "";
+        document.getElementById("mini-goal-amount").value = "";
+        document.getElementById("mini-goal-start").value = "";
+        document.getElementById("mini-goal-end").value = "";
+
+        document.getElementById("mini-goal-form").style.display = "none";
+        document.getElementById("add-mini-goal").style.display = "inline-block";
+    });
+
     document.getElementById("exportBtn").addEventListener("click", () => {
         const data = {
             totalGoal,
