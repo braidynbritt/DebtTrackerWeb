@@ -220,6 +220,8 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             const data = JSON.parse(saved);
 
+            if (!Array.isArray(data.miniGoals) || data.miniGoals.length === 0) return;
+
             totalGoal = data.totalGoal || 0;
             totalPaid = data.totalPaid || 0;
             startDate = data.startDate ? new Date(data.startDate) : null;
@@ -566,6 +568,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (miniGoals.length === 0) {
             document.getElementById("mini-goal-section").style.display = "none";
+            document.getElementById("total-progress-container").style.display = "none";
+            document.getElementById("time-progress-container").style.display = "none";
+            document.getElementById("deadline-status").innerText = "";
+            document.getElementById("reset-all").style.display = "none";
+            document.getElementById("miniGoalToggle").style.display = "none";
+            document.getElementById("sort-wrapper").style.display = "none";
+            document.getElementById("sort-hint").style.display = "none";
+
+            localStorage.removeItem("goalPayData");
         }
 
         const container = document.querySelector(`[data-goal-id="${goalId}"]`);
@@ -663,10 +674,14 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("time-progress-container").style.display = "block";
         document.getElementById("reset-all").style.display = "block";
 
+
         document.getElementById("mini-goal-section").style.display = miniGoals.length > 0 ? "block" : "none";
 
         if (miniGoalsToggle) {
             miniGoalsToggle.style.display = miniGoals.length > 0 ? "inline-block" : "none";
+            document.getElementById("miniGoalToggle").style.display = miniGoals.length > 0 ? "block" : "none";
+            document.getElementById("sort-wrapper").style.display = miniGoals.length > 0 ? "flex" : "none";
+            document.getElementById("sort-hint").style.display = miniGoals.length > 0 ? "flex" : "none";
         }
     }
 
@@ -687,6 +702,10 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("mini-goal-amount").value = "";
         document.getElementById("mini-goal-start").value = "";
         document.getElementById("mini-goal-end").value = "";
+
+        document.getElementById("miniGoalToggle").style.display =  "none";
+        document.getElementById("sort-wrapper").style.display = "none";
+        document.getElementById("sort-hint").style.display = "none";
 
         document.getElementById("total-progress-container").style.display = "none";
         document.getElementById("time-progress-container").style.display = "none";

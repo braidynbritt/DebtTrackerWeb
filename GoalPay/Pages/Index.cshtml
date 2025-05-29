@@ -69,9 +69,9 @@
 <div id="goal-controls">
     <button id="reset-all" onclick="resetAll()" style="display: none">Reset All</button>
     <button id="add-mini-goal">Add Mini Goal</button>
-    <button onclick="toggleMiniGoalList()">▼ Mini Goals</button>
+    <button id="miniGoalToggle" style="display: none" onclick="toggleMiniGoalList()">▼ Mini Goals</button>
 
-    <div id="sort-wrapper">
+    <div id="sort-wrapper" style="display: none">
         <label for="sort-options">Sort by:</label>
         <select id="sort-options">
             <option value="amount-asc">Amount (Low → High)</option>
@@ -86,7 +86,7 @@
     </div>
 </div>
 
-<p id="sort-hint" style="margin: 4px 0 12px 0; font-size: 0.85em; color: #555;">
+<p id="sort-hint" style="margin: 4px 0 12px 0; font-size: 0.85em; color: #555; display: none;">
     Sorted by creation order until a sort option is selected.
 </p>
 
