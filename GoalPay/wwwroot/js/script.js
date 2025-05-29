@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const a = document.createElement("a");
         a.href = url;
-        a.download = `debt-tracker-${formattedDate}.json`;
+        a.download = `goalpay-${formattedDate}.json`;
         a.click();
 
         URL.revokeObjectURL(url);
@@ -123,11 +123,11 @@ document.addEventListener("DOMContentLoaded", () => {
             endDate: endDate ? endDate.toISOString() : null
         };
 
-        localStorage.setItem("debtTrackerData", JSON.stringify(data));
+        localStorage.setItem("goalPayData", JSON.stringify(data));
     }
 
     function loadFromLocalStorage() {
-        const saved = localStorage.getItem("debtTrackerData");
+        const saved = localStorage.getItem("goalPayData");
         if (!saved) return;
 
         try {
