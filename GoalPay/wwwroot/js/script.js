@@ -324,7 +324,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (goal.paid >= goal.amount) {
             statusLabel = "✅ Goal Met";
             statusColor = "green";
-        } else if (goal.paid / goal.amount < 0.5) {
+        } else if (goal.paid / goal.amount < 0.05) {
             statusLabel = "❌ Behind";
             statusColor = "red";
         } else {
@@ -472,13 +472,24 @@ document.addEventListener("DOMContentLoaded", () => {
         const fill = document.getElementById(`mini-fill-${goal.id}`);
         const status = document.getElementById(`mini-status-${goal.id}`);
 
+        const now = new Date();
+        const totalDuration = goal.end - goal.start;
+        const elapsed = now - goal.start;
+        const expectedProgress = (elapsed / totalDuration);
+        const actualProgress = goal.paid / goal.amount;
+        const diff = actualProgress - expectedProgress;
+
         let statusLabel;
         let statusColor;
 
         if (goal.paid >= goal.amount) {
             statusLabel = "✅ Goal Met";
             statusColor = "green";
-        } else if (goal.paid / goal.amount < 0.5) {
+        }
+        else if (diff > 0.05) {
+            statusLabel = "✅ Ahead of Goal";
+            statusColor = "green";
+        } else if (diff < -0.05) {
             statusLabel = "❌ Behind";
             statusColor = "red";
         } else {
@@ -623,7 +634,7 @@ document.addEventListener("DOMContentLoaded", () => {
             deadlineText.innerText = "Goal has not started yet.";
             if (timeFill) {
                 timeFill.style.width = "0%";
-                timeFill.style.backgroundColor = "#4caf50";
+                timeFill.style.backgroundColor = "green";
             }
             if (timeText) timeText.innerText = `0 days passed, ${totalDays} total`;
             return;

@@ -68,8 +68,8 @@
 
 <div id="goal-controls">
     <button id="reset-all" onclick="resetAll()" style="display: none">Reset All</button>
-    <button id="add-mini-goal">Add Mini Goal</button>
-    <button id="miniGoalToggle" style="display: none" onclick="toggleMiniGoalList()">▼ Mini Goals</button>
+    <button id="add-mini-goal">Add Sub Goal</button>
+    <button id="miniGoalToggle" style="display: none" onclick="toggleMiniGoalList()">▼ Sub Goals</button>
 
     <div id="sort-wrapper" style="display: none">
         <label for="sort-options">Sort by:</label>
@@ -99,7 +99,7 @@
     <input type="date" id="mini-goal-start" />
     <label>End Date:</label>
     <input type="date" id="mini-goal-end" min="@DateTime.Now.ToString("yyyy-MM-dd")" />
-    <button id="submit-mini-goal">Submit Mini Goal</button>
+    <button id="submit-mini-goal">Submit Sub Goal</button>
     <button id="cancel-mini-goal">Cancel</button>
 </div>
 
