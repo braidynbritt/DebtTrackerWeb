@@ -90,57 +90,62 @@
     Sorted by creation order until a sort option is selected.
 </p>
 
-<div id="mini-goal-form" style="display: none; margin-top: 12px;">
-    <div class="mini-goal-form-container">
-        <div class="mini-goal-form-row">
-            <div class="form-column">
-                <div class="form-group">
-                    <label for="mini-goal-title">Title:</label>
-                    <input type="text" id="mini-goal-title" placeholder="e.g. Emergency Fund" />
-                    <span id="title-error" class="error-msg"></span>
-                </div>
+<div id="goal-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeModal()">✖</button>
 
-                <div class="form-group">
-                    <label for="mini-goal-amount">Amount:</label>
-                    <input type="number" id="mini-goal-amount" placeholder="e.g. 1000.00" />
-                    <span id="amount-error" class="error-msg"></span>
-                </div>
+        <div id="mini-goal-form">
+            <div class="mini-goal-form-container">
+                <div class="mini-goal-form-row">
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="mini-goal-title">Title:</label>
+                            <input type="text" id="mini-goal-title" placeholder="e.g. Emergency Fund" />
+                            <span id="title-error" class="error-msg"></span>
+                        </div>
 
-                <div class="form-group">
-                    <label for="mini-goal-interest">Interest Rate (optional):</label>
-                    <input type="number" id="mini-goal-interest" step="0.01" placeholder="e.g. 14 for 14%" />
-                    <span id="interest-error" class="error-msg"></span>
-                    <div class="form-helper">
-                        Interest is calculated based on your goal duration, not the lender’s full loan term. Defaults to 0% if no interest is entered.
+                        <div class="form-group">
+                            <label for="mini-goal-amount">Amount:</label>
+                            <input type="number" id="mini-goal-amount" placeholder="e.g. 1000.00" />
+                            <span id="amount-error" class="error-msg"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="mini-goal-interest">Interest Rate (optional):</label>
+                            <input type="number" id="mini-goal-interest" step="0.01" placeholder="e.g. 14 for 14%" />
+                            <span id="interest-error" class="error-msg"></span>
+                            <div class="form-helper">
+                                Interest is calculated based on your goal duration, not the lender’s full loan term. Defaults to 0% if no interest is entered.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="mini-goal-start">Start Date:</label>
+                            <input type="date" id="mini-goal-start" />
+                            <span id="start-error" class="error-msg"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="mini-goal-end">End Date:</label>
+                            <input type="date" id="mini-goal-end" />
+                            <span id="end-error" class="error-msg"></span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="form-column">
-                <div class="form-group">
-                    <label for="mini-goal-start">Start Date:</label>
-                    <input type="date" id="mini-goal-start" />
-                    <span id="start-error" class="error-msg"></span>
-                </div>
-
-                <div class="form-group">
-                    <label for="mini-goal-end">End Date:</label>
-                    <input type="date" id="mini-goal-end" />
-                    <span id="end-error" class="error-msg"></span>
+                <div class="form-actions">
+                    <button id="submit-mini-goal">Submit Sub Goal</button>
+                    <button id="cancel-mini-goal" onclick="closeModal()">Cancel</button>
                 </div>
             </div>
-        </div>
-
-        <div class="form-actions">
-            <button id="submit-mini-goal">Submit Sub Goal</button>
-            <button id="cancel-mini-goal">Cancel</button>
         </div>
     </div>
 </div>
 
-
-<div id="mini-goal-section" style="display: none; max-width: 600px; margin-top: 12px;">
-    <div id="mini-goal-list" style="display: block;">
+<div id="mini-goal-section" class="collapsed animated" style="max-width: 600px;">
+    <div id="mini-goal-list" class="subgoal-collapse">
         <div id="goal-list" style="margin-top: 12px;"></div>
     </div>
 </div>

@@ -6,23 +6,59 @@ let startDate = null;
 let endDate = null;
 
 document.addEventListener("DOMContentLoaded", () => {
+    function openModal() {
+        const modal = document.getElementById('goal-modal');
+        const form = document.getElementById('mini-goal-form');
 
-    document.getElementById("add-mini-goal").addEventListener("click", () => {
-        document.getElementById("mini-goal-form").style.display = "block";
-        document.getElementById("add-mini-goal").style.display = "none";
-    });
+        modal.style.display = 'flex';
 
-    document.getElementById("submit-mini-goal").addEventListener("click", confirmAddMiniGoal);
+        if (form) {
+            form.style.display = 'block';
+        }
+    }
 
-    document.getElementById("cancel-mini-goal").addEventListener("click", () => {
+    function closeModal() {
+        const modal = document.getElementById("goal-modal");
+        if (modal) {
+            modal.style.display = "none";
+        }
+
         document.getElementById("mini-goal-title").value = "";
         document.getElementById("mini-goal-amount").value = "";
         document.getElementById("mini-goal-start").value = "";
         document.getElementById("mini-goal-end").value = "";
+        document.getElementById("mini-goal-interest").value = "";
 
-        document.getElementById("mini-goal-form").style.display = "none";
+        document.getElementById("title-error").innerText = "";
+        document.getElementById("amount-error").innerText = "";
+        document.getElementById("start-error").innerText = "";
+        document.getElementById("end-error").innerText = "";
+        document.getElementById("interest-error").innerText = "";
+
+        document.getElementById("mini-goal-title").classList.remove("input-error");
+        document.getElementById("mini-goal-amount").classList.remove("input-error");
+        document.getElementById("mini-goal-start").classList.remove("input-error");
+        document.getElementById("mini-goal-end").classList.remove("input-error");
+        document.getElementById("mini-goal-interest").classList.remove("input-error");
+
         document.getElementById("add-mini-goal").style.display = "inline-block";
+    }
+
+    document.getElementById("cancel-mini-goal").addEventListener("click", () => {
+        closeModal();
     });
+
+    document.getElementById("add-mini-goal").onclick = openModal;
+
+    window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeModal();
+    });
+
+    document.getElementById("goal-modal").addEventListener("click", (e) => {
+        if (e.target.id === "goal-modal") closeModal();
+    });
+
+    document.getElementById("submit-mini-goal").addEventListener("click", confirmAddMiniGoal);
 
     document.getElementById("exportBtn").addEventListener("click", () => {
         const data = {
@@ -258,8 +294,31 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function toggleMiniGoalList() {
-        const section = document.getElementById("mini-goal-list");
-        section.style.display = (section.style.display === "none") ? "block" : "none";
+        const section = document.getElementById("mini-goal-section");
+        const list = document.getElementById("mini-goal-list");
+        const button = document.getElementById("miniGoalToggle");
+
+        const isCollapsed = list.classList.contains("subgoal-collapse");
+
+        if (isCollapsed) {
+            section.classList.remove("collapsed");
+            section.classList.add("expanded");
+
+            list.classList.remove("subgoal-collapse");
+            list.classList.add("subgoal-expand");
+
+            button.textContent = "▼ Sub Goals";
+        } else {
+            list.classList.remove("subgoal-expand");
+            list.classList.add("subgoal-collapse");
+
+            setTimeout(() => {
+                section.classList.remove("expanded");
+                section.classList.add("collapsed");
+            }, 400);
+
+            button.textContent = "► Sub Goals";
+        }
     }
 
     function confirmAddMiniGoal() {
@@ -361,6 +420,8 @@ document.addEventListener("DOMContentLoaded", () => {
         endInput.value = "";
         document.getElementById("mini-goal-form").style.display = "none";
         document.getElementById("add-mini-goal").style.display = "inline-block";
+
+        closeModal();
     }
 
 
@@ -417,8 +478,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
             
                 <div style="max-width: 600px; width: 100%; font-size: 0.85em; color: #555; margin-top: 2px;">
-                    ${goal.interest ? `<div style="font-size: 0.85em; color: #444;">Interest: ${goal.interest}% APR</div>` : ""}
-                    ${goal.start.toLocaleDateString()} → ${goal.end.toLocaleDateString()}
+                   ${goal.interest ? `<div class="subgoal-interest">Interest: ${goal.interest}% APR</div>` : ""}
+                   <div class="subgoal-date">${goal.start.toLocaleDateString()} → ${goal.end.toLocaleDateString()}</div>
                 </div>
             
                 <label style="font-size: 0.85em; margin-top: 8px;">Time Progress</label>
