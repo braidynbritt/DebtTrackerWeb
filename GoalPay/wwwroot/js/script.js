@@ -819,5 +819,8 @@ document.addEventListener("DOMContentLoaded", () => {
     window.undoMiniGoal = undoMiniGoal;
     window.confirmAddMiniGoal = confirmAddMiniGoal;
     window.resetAll = resetAll;
+    window.closeModal = closeModal;
+    window.openModal = openModal;
+    window.toggleTheme = toggleTheme;
 
 });

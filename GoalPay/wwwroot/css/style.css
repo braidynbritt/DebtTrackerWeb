@@ -1,21 +1,70 @@
-﻿body {
-    font-family: system-ui, sans-serif;
-    color: #222;
-    height: 100%;
+﻿html {
+    overflow-y: scroll;
+    margin: 0;
+    padding: 0;
+    background: transparent;
 }
 
-#footer * {
-    padding: 4px 0 !important;
-    margin: 0 !important;
-    text-align: center;
-    font-size: 0.85em;
-    background-color: #f8f9fa;
-    border-top: 1px solid #ddd;
+main {
+    padding-bottom: 60px;
+}
+
+body {
+    font-family: "Segoe UI", system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--text);
+    background-color: var(--bg);
+    margin: 0;
+    padding: 0;
+}
+
+body.dark {
+    --bg: #121212;
+    --text: #f0f0f0;
+    --border: #666;
+    --form-bg: #1a1a1a;
+    --dim-text: #ccc;
+    --subgoal-text: #e6e6e6;
+    --total-date-text: #ccc;
+    --date-text: #ccc;
+    --interest-text: #ccc;
+    background-color: var(--bg) !important;
+    background-image: none !important;
+}
+
+body {
+    --bg: #fff;
+    --text: #222;
+    --border: #ccc;
+    --form-bg: #fff;
+    --dim-text: #444;
+    --subgoal-text: #444;
+    --date-text: #555;
+    --interest-text: #555;
+}
+
+footer.footer {
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+    border-top: 1px solid #ccc;
+    background-color: var(--bg);
+    color: var(--text);
+    z-index: 999;
 }
 
 h1 {
-    font-size: 2em;
-    margin-bottom: 6px;
+    font-size: 1.6rem;
+}
+
+h2 {
+    font-size: 1.25rem;
+}
+
+h1, h2, h3 {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
 }
 
 p {
@@ -23,19 +72,42 @@ p {
 }
 
 button {
-    margin: 6px 6px 0 0;
-    height: 34px;
-    padding: 4px 10px;
-    font-size: 0.9em;
-    border: 2px solid #333;
-    background-color: white;
-    cursor: pointer;
+    padding: 5px 12px;
+    font-size: 0.9rem;
     border-radius: 6px;
+    border: 1px solid #444;
+    background-color: white;
+    color: black;
+    cursor: pointer;
     transition: background-color 0.2s ease;
+}
+
+body.dark .navbar {
+    background-color: var(--form-bg) !important;
+    border-bottom: 1px solid var(--border) !important;
+}
+
+body.dark .navbar-brand,
+body.dark .nav-link {
+    color: var(--text) !important;
+}
+
+body.dark #sort-hint{
+    color: var(--dim-text) !important;
+}
+
+body.dark button {
+    background-color: #2c2c2c;
+    color: #f0f0f0;
+    border: 1px solid #777;
 }
 
 button:hover {
     background-color: #f0f0f0;
+}
+
+body.dark button:hover {
+    background-color: #3a3a3a;
 }
 
 button:disabled {
@@ -44,31 +116,82 @@ button:disabled {
     cursor: not-allowed;
 }
 
+.toggle-container {
+    position: relative;
+    width: 52px;
+    height: 28px;
+    border-radius: 28px;
+    background-color: #ccc;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.toggle-container.dark {
+    background-color: #444;
+}
+
+.toggle-slider {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: white;
+    transition: transform 0.3s ease;
+    z-index: 2;
+}
+
+.toggle-container.dark .toggle-slider {
+    transform: translateX(24px);
+    background-color: #111;
+}
+
+.toggle-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    z-index: 1;
+    color: white;
+}
+
+.toggle-icon.sun {
+    left: 8px;
+}
+
+.toggle-icon.moon {
+    right: 8px;
+}
+
 input[type="text"],
 input[type="number"],
-input[type="date"] {
-    margin: 4px 6px 8px 0;
-    padding: 6px;
-    border-radius: 4px;
-    border: 1px solid #aaa;
-    font-size: 0.95em;
+input[type="date"],
+select {
+    padding: 6px 10px;
+    font-size: 0.95rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: var(--form-bg);
+    color: var(--text);
+    appearance: none;
+    background-image: none;
 }
 
 label[for="mini-goal-interest"] {
     font-style: italic;
-    color: #555;
+    color: var(--dim-text);
 }
 
 label {
-    display: block;
     font-weight: 500;
-    margin-top: 10px;
-}
-
-html {
-    height: 100%;
-    margin: 0;
-    padding: 0;
+    display: block;
+    margin-bottom: 4px;
+    color: var(--text);
 }
 
 .navbar {
@@ -95,6 +218,15 @@ html {
     margin-top: 6px;
 }
 
+body.dark .progress-bar {
+    background-color: #333;
+    box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.1);
+}
+
+body.dark .progress-fill {
+    box-shadow: 0 0 4px rgba(255, 255, 255, 0.15);
+}
+
 .progress-fill {
     height: 100%;
     width: 0%;
@@ -105,7 +237,7 @@ html {
 .legend {
     margin-top: 6px;
     font-size: 0.85em;
-    color: #555;
+    color: var(--dim-text);
 }
 
 .legend div {
@@ -124,14 +256,6 @@ html {
     border: 2px solid red;
 }
 
-.mini-goal-form-container {
-    padding: 1rem;
-    border: 2px solid #ccc;
-    border-radius: 12px;
-    background-color: #f9f9f9;
-    margin: 1rem 0;
-}
-
 .form-column {
     flex: 1;
     min-width: 250px;
@@ -143,22 +267,26 @@ html {
     gap: 2rem;
 }
 
+.mini-goal:hover {
+    background-color: rgba(255, 255, 255, 0.02);
+    border-color: var(--text);
+}
+
 .form-actions {
     display: flex;
     justify-content: flex-start;
     gap: 0.75rem;
+    margin-top: 0.75rem;
 }
 
 .form-group {
-    display: flex;
-    flex-direction: column;
     margin-bottom: 0.75rem;
 }
 
 .form-group input {
     max-width: 100%;
     padding: 0.5rem;
-    font-size: 1rem;
+    font-size: 0.95rem;
 }
 
 .error-msg {
@@ -168,35 +296,130 @@ html {
     margin-top: 2px;
 }
 
-.form-actions {
-    margin-top: 1rem;
-    display: flex;
-    gap: 0.75rem;
-}
-
 .mini-payment-error {
     position: absolute;
-    bottom: -1.1em;
+    bottom: -1.6em;
     left: 0;
     font-size: 0.75rem;
     color: red;
     white-space: nowrap;
 }
 
-.form-helper {
+.form-helper,
+.date-text,
+.interest-text {
     font-size: 0.75rem;
-    color: #666;
+    color: var(--dim-text);
     margin-top: 2px;
 }
 
-#total-progress-container span {
-    color: #333;
+.subgoal-detail {
+    font-size: 0.85rem;
+    color: var(--subgoal-text);
+    margin-top: 2px;
+}
+
+.subgoal-date {
+    font-size: 0.85rem;
+    color: var(--date-text);
+    margin-top: 2px;
+}
+
+.subgoal-interest {
+    font-size: 0.85rem;
+    color: var(--interest-text);
+    margin-top: 2px;
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    background-color: var(--form-bg);
+    padding: 2rem;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 700px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    position: relative;
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    font-size: 1.2rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--text);
+}
+
+#total-progress-container,
+#time-progress-container,
+.mini-goal,
+.mini-goal-form-container {
+    margin-bottom: 1.5rem;
+    padding: 0.75rem 1rem;
+}
+
+.mini-goal {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background-color: var(--form-bg);
+}
+
+body.dark .mini-goal,
+body.dark .modal-content {
+    border: 1px solid #444;
+}
+
+.subgoal-expand {
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+}
+
+.subgoal-collapse {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+}
+
+#mini-goal-section.collapsed {
+    max-height: 0;
+    opacity: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: 0;
+    overflow: hidden;
+}
+
+#mini-goal-section.expanded {
+    max-height: none;
+    opacity: 1;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    margin-top: 12px;
+}
+
+html, body {
+    background-color: var(--bg);
 }
 
 #deadline-status {
     font-weight: bold;
     margin-top: 10px;
-    color: #333;
+    color: var(--text);
 }
 
 #add-payment {
@@ -212,9 +435,10 @@ html {
     height: 34px;
     width: 230px;
     line-height: normal;
-    border: 2px solid #333;
+    border: 2px solid var(--border);
     border-radius: 6px;
-    background-color: white;
+    background-color: var(--form-bg);
+    color: var(--text);
     box-sizing: border-box;
     position: relative;
     top: 5px;
@@ -251,6 +475,19 @@ html {
     gap: 6px;
     align-items: center;
     margin-bottom: 12px;
+}
+
+body:not(.dark) #total-date-range {
+    color: var(--total-date-text);
+}
+
+body.dark #total-date-range {
+    color: var(--total-date-text);
+}
+
+#mini-goal-section.animated {
+    overflow: hidden;
+    transition: max-height 0.4s ease, opacity 0.4s ease;
 }
 
 details[open] summary + div {
