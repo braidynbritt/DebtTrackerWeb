@@ -1,6 +1,4 @@
-﻿
-
-function toggleTheme() {
+﻿function toggleTheme() {
     const body = document.body;
     const toggle = document.getElementById('theme-toggle');
 
