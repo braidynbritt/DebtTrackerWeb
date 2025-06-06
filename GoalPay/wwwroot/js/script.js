@@ -4,6 +4,7 @@ let miniGoalIdCounter = 0;
 let miniGoals = [];
 let startDate = null;
 let endDate = null;
+let version = "1.4";
 
 document.addEventListener("DOMContentLoaded", () => {
     function openModal() {
@@ -243,7 +244,8 @@ document.addEventListener("DOMContentLoaded", () => {
             totalGoal,
             totalPaid,
             startDate: startDate ? startDate.toISOString() : null,
-            endDate: endDate ? endDate.toISOString() : null
+            endDate: endDate ? endDate.toISOString() : null,
+            version
         };
 
         localStorage.setItem("goalPayData", JSON.stringify(data));
@@ -256,6 +258,18 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             const data = JSON.parse(saved);
 
+            if (!data.version || data.version !== version) {
+                const proceed = confirm(
+                    "Your saved data is from an older version and may not be compatible. Do you want to reset your progress?"
+                );
+                if (proceed) {
+                    localStorage.removeItem("goalPayData");
+                    return;
+                } else {
+                    alert("Some features may not work correctly until data is updated.");
+                }
+            }
+
             if (!Array.isArray(data.miniGoals) || data.miniGoals.length === 0) return;
 
             totalGoal = data.totalGoal || 0;
@@ -265,7 +279,7 @@ document.addEventListener("DOMContentLoaded", () => {
             miniGoalIdCounter = data.miniGoalIdCounter || 0;
 
             miniGoals = [];
-            for (const goal of data.miniGoals || []) {
+            for (const goal of data.miniGoals) {
                 goal.start = new Date(goal.start);
                 goal.end = new Date(goal.end);
                 if (!goal.hasOwnProperty("interest")) {
@@ -280,14 +294,17 @@ document.addEventListener("DOMContentLoaded", () => {
             updateTotalFromMiniGoals();
             sortMiniGoalsBySelectedOption();
             showAllSections();
+
             if (miniGoals.length > 0) {
                 document.getElementById("mini-goal-section").style.display = "block";
             }
 
         } catch (e) {
             console.error("Failed to load saved data:", e);
+            alert("Something went wrong loading your saved data. It may be corrupted.");
         }
     }
+
 
     function isDuplicateGoalName(name) {
         return miniGoals.some(goal => goal.title?.trim().toLowerCase() === name.trim().toLowerCase());
