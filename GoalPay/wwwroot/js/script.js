@@ -305,7 +305,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-
     function isDuplicateGoalName(name) {
         return miniGoals.some(goal => goal.title?.trim().toLowerCase() === name.trim().toLowerCase());
     }
@@ -440,7 +439,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         closeModal();
     }
-
 
     function renderMiniGoal(goal) {
         const container = document.createElement("div");
@@ -679,7 +677,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         updateMiniDeadlineProgress(goal);
     }
-
 
     function updateTotalFromMiniGoals() {
         if (miniGoals.length === 0) {
