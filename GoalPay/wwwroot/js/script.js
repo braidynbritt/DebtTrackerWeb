@@ -232,6 +232,9 @@ document.addEventListener("DOMContentLoaded", () => {
             for (const goal of data.miniGoals || []) {
                 goal.start = new Date(goal.start);
                 goal.end = new Date(goal.end);
+                if (!goal.hasOwnProperty("interest")) {
+                    goal.interest = 0;
+                }
                 miniGoals.push(goal);
                 renderMiniGoal(goal);
                 updateMiniGoalProgress(goal);
@@ -250,40 +253,89 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    function isDuplicateGoalName(name) {
+        return miniGoals.some(goal => goal.title?.trim().toLowerCase() === name.trim().toLowerCase());
+    }
+
     function toggleMiniGoalList() {
         const section = document.getElementById("mini-goal-list");
         section.style.display = (section.style.display === "none") ? "block" : "none";
     }
 
     function confirmAddMiniGoal() {
-        const title = document.getElementById("mini-goal-title").value.trim();
-        const amount = parseFloat(document.getElementById("mini-goal-amount").value.trim());
-        const start = document.getElementById("mini-goal-start").value.trim();
-        const end = document.getElementById("mini-goal-end").value.trim();
+        const titleInput = document.getElementById("mini-goal-title");
+        const amountInput = document.getElementById("mini-goal-amount");
+        const startInput = document.getElementById("mini-goal-start");
+        const endInput = document.getElementById("mini-goal-end");
 
-        if (!title || isNaN(amount) || amount <= 0 || !start || !end) {
-            alert("Please fill in all fields correctly.");
-            return;
+        const titleError = document.getElementById("title-error");
+        const amountError = document.getElementById("amount-error");
+        const startError = document.getElementById("start-error");
+        const endError = document.getElementById("end-error");
+
+        const interest = parseFloat(document.getElementById("mini-goal-interest").value.trim());
+
+
+        [titleInput, amountInput, startInput, endInput].forEach(el => el.classList.remove("input-error"));
+        [titleError, amountError, startError, endError].forEach(el => el.textContent = "");
+
+        const title = titleInput.value.trim();
+        const amount = parseFloat(amountInput.value.trim());
+        const start = startInput.value.trim();
+        const end = endInput.value.trim();
+
+        let hasError = false;
+
+        if (!title) {
+            titleInput.classList.add("input-error");
+            titleError.textContent = "Title is required.";
+            hasError = true;
+        }
+
+        if (isDuplicateGoalName(title)) {
+            titleInput.classList.add("input-error");
+            titleError.textContent = "A mini-goal with this title already exists.";
+            hasError = true;
+        }
+
+        if (isNaN(amount) || amount <= 0) {
+            amountInput.classList.add("input-error");
+            amountError.textContent = "Enter a valid positive amount.";
+            hasError = true;
         }
 
         const [sYear, sMonth, sDay] = start.split("-").map(Number);
         const startDateobj = new Date(sYear, sMonth - 1, sDay);
-
         const [eYear, eMonth, eDay] = end.split("-").map(Number);
         const endDateobj = new Date(eYear, eMonth - 1, eDay);
+        const today = new Date(); today.setHours(0, 0, 0, 0);
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        if (endDateobj < today) {
-            alert("End date cannot be in the past.");
-            return;
+        if (!start) {
+            startInput.classList.add("input-error");
+            startError.textContent = "Start date is required.";
+            hasError = true;
         }
 
-        if (startDateobj >= endDateobj) {
-            alert("Start date must be before end date.");
-            return;
+        if (!end) {
+            endInput.classList.add("input-error");
+            endError.textContent = "End date is required.";
+            hasError = true;
+        } else {
+            if (endDateobj < today) {
+                endInput.classList.add("input-error");
+                endError.textContent = "End date cannot be in the past.";
+                hasError = true;
+            }
+
+            if (start && startDateobj >= endDateobj) {
+                startInput.classList.add("input-error");
+                endInput.classList.add("input-error");
+                endError.textContent = "End date must be after start date.";
+                hasError = true;
+            }
         }
+
+        if (hasError) return;
 
         const goal = {
             id: miniGoalIdCounter++,
@@ -292,8 +344,9 @@ document.addEventListener("DOMContentLoaded", () => {
             paid: 0,
             start: startDateobj,
             end: endDateobj,
-            payments: []
-        }
+            payments: [],
+            interest: isNaN(interest) ? 0 : interest
+        };
 
         miniGoals.push(goal);
         document.getElementById("mini-goal-section").style.display = "block";
@@ -302,13 +355,14 @@ document.addEventListener("DOMContentLoaded", () => {
         updateTotalFromMiniGoals();
         saveToLocalStorage();
 
-        document.getElementById("mini-goal-title").value = "";
-        document.getElementById("mini-goal-amount").value = "";
-        document.getElementById("mini-goal-start").value = "";
-        document.getElementById("mini-goal-end").value = "";
+        titleInput.value = "";
+        amountInput.value = "";
+        startInput.value = "";
+        endInput.value = "";
         document.getElementById("mini-goal-form").style.display = "none";
         document.getElementById("add-mini-goal").style.display = "inline-block";
     }
+
 
     function renderMiniGoal(goal) {
         const container = document.createElement("div");
@@ -363,6 +417,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
             
                 <div style="max-width: 600px; width: 100%; font-size: 0.85em; color: #555; margin-top: 2px;">
+                    ${goal.interest ? `<div style="font-size: 0.85em; color: #444;">Interest: ${goal.interest}% APR</div>` : ""}
                     ${goal.start.toLocaleDateString()} → ${goal.end.toLocaleDateString()}
                 </div>
             
@@ -372,7 +427,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
                 <p id="mini-time-status-${goal.id}" style="margin: 2px 0; font-size: 0.8em;">0 days passed, X remaining</p>
             
-                <input type="number" placeholder="Payment Amount" class="mini-payment" />
+                <div style="position: relative; display: inline-block; width: 200px; margin-bottom: 0.5rem;">
+                    <input type="number" placeholder="Payment Amount" class="mini-payment" />
+                    <span class="mini-payment-error error-msg" style="display: none;"></span>
+                </div>
                 <button onclick="submitMiniPayment(${goal.id})">Pay</button>
                 <button onclick="undoMiniGoal(${goal.id})">Undo</button>
                 <button onclick="deleteMiniGoal(${goal.id})">Delete</button>
@@ -446,14 +504,23 @@ document.addEventListener("DOMContentLoaded", () => {
         const container = document.querySelector(`[data-goal-id="${goalId}"]`);
         const input = container.querySelector(".mini-payment");
         const amount = parseFloat(input.value);
+        const errorSpan = container.querySelector(".mini-payment-error");
+
+        errorSpan.style.display = "none";
+        input.classList.remove("input-error");
+        errorSpan.textContent = "";
 
         if (isNaN(amount) || amount <= 0) {
-            alert("Please enter a valid payment amount.");
+            input.classList.add("input-error");
+            errorSpan.textContent = "Enter a valid positive number.";
+            errorSpan.style.display = "block";
             return;
         }
 
         if (goal.paid + amount > goal.amount) {
-            alert("Payment exceeds mini goal amount.");
+            input.classList.add("input-error");
+            errorSpan.textContent = "Payment exceeds remaining balance.";
+            errorSpan.style.display = "block";
             return;
         }
 
@@ -468,25 +535,35 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function updateMiniGoalProgress(goal) {
-        const percent = (goal.paid / goal.amount) * 100;
-        const fill = document.getElementById(`mini-fill-${goal.id}`);
-        const status = document.getElementById(`mini-status-${goal.id}`);
-
         const now = new Date();
         const totalDuration = goal.end - goal.start;
         const elapsed = now - goal.start;
+
+        let effectiveAmount = goal.amount;
+        let interestAccrued = 0;
+
+        if (goal.interest > 0) {
+            const daysPassed = Math.max(0, Math.floor(elapsed / (1000 * 60 * 60 * 24)));
+            const dailyRate = (goal.interest / 100) / 365;
+            interestAccrued = goal.amount * dailyRate * daysPassed;
+            effectiveAmount += interestAccrued;
+        }
+
+        const percent = (goal.paid / effectiveAmount) * 100;
         const expectedProgress = (elapsed / totalDuration);
-        const actualProgress = goal.paid / goal.amount;
+        const actualProgress = goal.paid / effectiveAmount;
         const diff = actualProgress - expectedProgress;
+
+        const fill = document.getElementById(`mini-fill-${goal.id}`);
+        const status = document.getElementById(`mini-status-${goal.id}`);
 
         let statusLabel;
         let statusColor;
 
-        if (goal.paid >= goal.amount) {
+        if (goal.paid >= effectiveAmount) {
             statusLabel = "✅ Goal Met";
             statusColor = "green";
-        }
-        else if (diff > 0.05) {
+        } else if (diff > 0.05) {
             statusLabel = "✅ Ahead of Goal";
             statusColor = "green";
         } else if (diff < -0.05) {
@@ -503,12 +580,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (fill) fill.style.width = `${Math.min(percent, 100)}%`;
+
         const paidSpan = document.getElementById(`mini-paid-${goal.id}`);
         const remainingSpan = document.getElementById(`mini-remaining-${goal.id}`);
         if (paidSpan) paidSpan.innerText = `$${goal.paid.toFixed(2)} paid`;
         if (remainingSpan) {
-            const remaining = goal.amount - goal.paid;
-            remainingSpan.innerText = `$${remaining.toFixed(2)} left of $${goal.amount.toFixed(2)}`;
+            const remaining = effectiveAmount - goal.paid;
+            remainingSpan.innerText = `$${remaining.toFixed(2)} left of $${effectiveAmount.toFixed(2)}`;
         }
 
         const container = document.querySelector(`[data-goal-id="${goal.id}"]`);
@@ -516,17 +594,14 @@ document.addEventListener("DOMContentLoaded", () => {
             const input = container.querySelector(".mini-payment");
             const payButton = container.querySelector("button[onclick^='submitMiniPayment']");
 
-            if (input) {
-                input.disabled = goal.paid >= goal.amount;
-            }
-
-            if (payButton) {
-                payButton.disabled = goal.paid >= goal.amount;
-            }
+            const isComplete = goal.paid >= effectiveAmount;
+            if (input) input.disabled = isComplete;
+            if (payButton) payButton.disabled = isComplete;
         }
 
         updateMiniDeadlineProgress(goal);
     }
+
 
     function updateTotalFromMiniGoals() {
         if (miniGoals.length === 0) {

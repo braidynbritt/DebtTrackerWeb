@@ -54,6 +54,11 @@ input[type="date"] {
     font-size: 0.95em;
 }
 
+label[for="mini-goal-interest"] {
+    font-style: italic;
+    color: #555;
+}
+
 label {
     display: block;
     font-weight: 500;
@@ -113,6 +118,75 @@ html {
     background-color: #eee;
     color: #777;
     cursor: not-allowed;
+}
+
+.input-error {
+    border: 2px solid red;
+}
+
+.mini-goal-form-container {
+    padding: 1rem;
+    border: 2px solid #ccc;
+    border-radius: 12px;
+    background-color: #f9f9f9;
+    margin: 1rem 0;
+}
+
+.form-column {
+    flex: 1;
+    min-width: 250px;
+}
+
+.mini-goal-form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-start;
+    gap: 0.75rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.75rem;
+}
+
+.form-group input {
+    max-width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+}
+
+.error-msg {
+    color: red;
+    font-size: 0.75rem;
+    min-height: 1em;
+    margin-top: 2px;
+}
+
+.form-actions {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.75rem;
+}
+
+.mini-payment-error {
+    position: absolute;
+    bottom: -1.1em;
+    left: 0;
+    font-size: 0.75rem;
+    color: red;
+    white-space: nowrap;
+}
+
+.form-helper {
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 2px;
 }
 
 #total-progress-container span {
